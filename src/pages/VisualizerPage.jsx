@@ -68,7 +68,7 @@ export default function VisualizerPage() {
     animState,
     insert, lookup, resetFilter,
     updateSize, updateHashes,
-  } = useBloomFilter(32, ['djb2', 'fnv1a', 'sdbm'])
+  } = useBloomFilter(64, ['djb2', 'fnv1a', 'sdbm'])
 
   useEffect(() => {
     if (size > maxSize) updateSize(maxSize)
