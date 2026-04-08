@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
-import AppLayout from '../layouts/AppLayout'
-import VisualizerPage from '../pages/VisualizerPage'
+import AppLayout from '@/layouts/AppLayout'
+import VisualizerPage from '@/pages/VisualizerPage'
 
 export function createAppRouter(basename) {
   return createBrowserRouter(

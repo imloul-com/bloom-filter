@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { HASH_NAMES, HASH_COLORS, estimateFalsePositiveRate, optimalK } from '../utils/hashes'
+import { HASH_NAMES, HASH_COLORS, estimateFalsePositiveRate, optimalK } from '@/utils/hashes'
 
 const SIZE_PRESETS = [16, 32, 64, 128, 256, 512]
 
@@ -109,8 +109,12 @@ export default function Settings({ size, maxSize = 512, selectedHashes, onSizeCh
           {/* Bit array size */}
           <div>
             <Label>Bit array size (m)</Label>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.45 }}>
+              Changing m keeps inserted keys and re-hashes them into the new size. Real Bloom filters only store bits,
+              so they cannot resize or change k without the keys — this demo keeps the list on purpose.
+            </div>
             {maxSize < 512 && (
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, fontFamily: 'var(--font-mono)' }}>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6, fontFamily: 'var(--font-mono)' }}>
                 Max {maxSize} bits on this screen size
               </div>
             )}
@@ -155,8 +159,12 @@ export default function Settings({ size, maxSize = 512, selectedHashes, onSizeCh
           {/* Hash functions */}
           <div>
             <Label>Hash functions (k = {selectedHashes.length})</Label>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.45 }}>
+              Toggling hashes updates k and re-hashes every inserted key into the same m (still demo-only vs a real
+              filter).
+            </div>
             {insertedCount > 0 && (
-              <div style={{ fontSize: 11, color: 'var(--h3)', marginTop: 2 }}>
+              <div style={{ fontSize: 11, color: 'var(--h3)', marginTop: 6 }}>
                 Optimal k for {insertedCount} items: {optK}
               </div>
             )}
