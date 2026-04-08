@@ -1,5 +1,5 @@
 import React from 'react'
-import { HASH_COLORS } from '../utils/hashes'
+import { HASH_COLORS, rawHashBeforeMod } from '@/utils/hashes'
 
 export default function HashSteps({ animState, selectedHashes, word }) {
   const { phase, hashIdx, indices, result } = animState
@@ -130,7 +130,9 @@ export default function HashSteps({ animState, selectedHashes, word }) {
                 )}
                 {rowState === 'done' && idx !== undefined && (
                   <>
-                    <span style={{ color: 'var(--text-secondary)' }}>{computeRawHash(name, word, i)} mod {animState.size || '…'} =</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>
+                      {rawHashBeforeMod(name, word, i)} mod {animState.size ?? '…'} =
+                    </span>
                   </>
                 )}
               </div>
@@ -206,20 +208,3 @@ function ComputingDots({ color }) {
   )
 }
 
-// Just for display — approximate raw hash value
-function computeRawHash(name, word, seed) {
-  const seedVal = seed * 1327
-  try {
-    if (name === 'djb2') {
-      let h = (5381 ^ seedVal) >>> 0
-      for (let i = 0; i < word.length; i++) h = (Math.imul(h, 33) ^ word.charCodeAt(i)) >>> 0
-      return h
-    }
-    if (name === 'fnv1a') {
-      let h = (2166136261 ^ seedVal) >>> 0
-      for (let i = 0; i < word.length; i++) h = (Math.imul(h ^ word.charCodeAt(i), 16777619)) >>> 0
-      return h
-    }
-    return '…'
-  } catch { return '…' }
-}

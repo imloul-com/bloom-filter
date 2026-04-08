@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { HASH_COLORS } from '../utils/hashes'
+import { HASH_COLORS } from '@/utils/hashes'
 
 function useScreenBitLimit() {
   const [limit, setLimit] = useState(Infinity)
@@ -31,6 +31,7 @@ function getColorForOwners(owners) {
 function BitCell({ index, isOn, owners, animState, style }) {
   const [popKey, setPopKey] = useState(0)
   const [probeKey, setProbeKey] = useState(0)
+  /** Match current bit on mount so bulk layout changes (resize re-hash) do not look like inserts. */
   const prevOn = useRef(isOn)
 
   const isActive = animState.indices?.includes(index)
@@ -129,7 +130,7 @@ function BitCell({ index, isOn, owners, animState, style }) {
   )
 }
 
-export default function BitArray({ bits, bitOwners, animState, size }) {
+export default function BitArray({ bits, bitOwners, animState, size, layoutEpoch = 0 }) {
   const screenBitLimit = useScreenBitLimit()
   const visibleCount = Math.min(size, screenBitLimit)
   const hiddenCount = size - visibleCount
@@ -170,7 +171,7 @@ export default function BitArray({ bits, bitOwners, animState, size }) {
       }}>
         {bits.slice(0, visibleCount).map((bit, i) => (
           <BitCell
-            key={i}
+            key={`${layoutEpoch}-${i}`}
             index={i}
             isOn={bit === 1}
             owners={bitOwners[i]}

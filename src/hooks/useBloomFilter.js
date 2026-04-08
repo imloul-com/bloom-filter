@@ -1,5 +1,19 @@
 import { useState, useCallback, useRef } from 'react'
-import { getHashes, HASH_NAMES } from '../utils/hashes'
+import { getHashes } from '@/utils/hashes'
+
+function buildBitsFromItems(items, hashNames, m) {
+  const nextBits = new Array(m).fill(0)
+  const nextOwners = new Array(m).fill(null).map(() => new Set())
+  for (const word of items) {
+    const indices = getHashes(word, hashNames, m)
+    for (let i = 0; i < hashNames.length; i++) {
+      const idx = indices[i]
+      nextBits[idx] = 1
+      nextOwners[idx].add(i)
+    }
+  }
+  return { nextBits, nextOwners }
+}
 
 export function useBloomFilter(initialSize = 32, initialHashNames = ['djb2', 'fnv1a', 'sdbm']) {
   const [size, setSize] = useState(initialSize)
@@ -9,6 +23,8 @@ export function useBloomFilter(initialSize = 32, initialHashNames = ['djb2', 'fn
   const [bitOwners, setBitOwners] = useState(() => new Array(initialSize).fill(null).map(() => new Set()))
   const [insertedItems, setInsertedItems] = useState([])
   const [animState, setAnimState] = useState({ active: false, phase: null, word: '', hashIdx: -1, indices: [], probingIdx: -1 })
+  /** Bumped on `updateSize` / `updateHashes` so bit cells remount without insert-style pop animations. */
+  const [bitLayoutEpoch, setBitLayoutEpoch] = useState(0)
 
   const isAnimating = useRef(false)
 
@@ -23,14 +39,30 @@ export function useBloomFilter(initialSize = 32, initialHashNames = ['djb2', 'fn
   }, [size, selectedHashes])
 
   const updateSize = useCallback((newSize) => {
+    if (newSize === size || isAnimating.current) return
+    const { nextBits, nextOwners } = buildBitsFromItems(insertedItems, selectedHashes, newSize)
     setSize(newSize)
-    resetFilter(newSize, selectedHashes)
-  }, [selectedHashes, resetFilter])
+    setBits(nextBits)
+    setBitOwners(nextOwners)
+    setBitLayoutEpoch(e => e + 1)
+    setAnimState({ active: false, phase: null, word: '', hashIdx: -1, indices: [], probingIdx: -1 })
+    isAnimating.current = false
+  }, [size, selectedHashes, insertedItems])
 
   const updateHashes = useCallback((newHashes) => {
+    if (isAnimating.current) return
+    const unchanged =
+      newHashes.length === selectedHashes.length &&
+      newHashes.every((h, i) => h === selectedHashes[i])
+    if (unchanged) return
+    const { nextBits, nextOwners } = buildBitsFromItems(insertedItems, newHashes, size)
     setSelectedHashes(newHashes)
-    resetFilter(size, newHashes)
-  }, [size, resetFilter])
+    setBits(nextBits)
+    setBitOwners(nextOwners)
+    setBitLayoutEpoch(e => e + 1)
+    setAnimState({ active: false, phase: null, word: '', hashIdx: -1, indices: [], probingIdx: -1 })
+    isAnimating.current = false
+  }, [size, selectedHashes, insertedItems])
 
   const sleep = (ms) => new Promise(r => setTimeout(r, ms))
 
@@ -104,6 +136,7 @@ export function useBloomFilter(initialSize = 32, initialHashNames = ['djb2', 'fn
   return {
     size, selectedHashes, bits, bitOwners, insertedItems,
     animState,
+    bitLayoutEpoch,
     insert, lookup, resetFilter,
     updateSize, updateHashes,
   }

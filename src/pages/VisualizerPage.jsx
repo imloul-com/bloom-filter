@@ -1,13 +1,15 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
-import { useBloomFilter } from '../hooks/useBloomFilter'
-import { useTheme } from '../hooks/useTheme'
-import BitArray from '../components/BitArray'
-import HashSteps from '../components/HashSteps'
-import Settings from '../components/Settings'
-import StatsBar from '../components/StatsBar'
-import InsertedList from '../components/InsertedList'
-import ResultBanner from '../components/ResultBanner'
-import { HASH_COLORS } from '../utils/hashes'
+import { useBloomFilter } from '@/hooks/useBloomFilter'
+import { useTheme } from '@/hooks/useTheme'
+import BitArray from '@/components/BitArray'
+import HashSteps from '@/components/HashSteps'
+import Settings from '@/components/Settings'
+import StatsBar from '@/components/StatsBar'
+import InsertedList from '@/components/InsertedList'
+import ResultBanner from '@/components/ResultBanner'
+import { HASH_COLORS } from '@/utils/hashes'
+import ThemeSunIcon from '@/assets/icons/theme-sun.svg?react'
+import ThemeMoonIcon from '@/assets/icons/theme-moon.svg?react'
 
 const SUGGESTIONS = ['redis', 'bloom', 'filter', 'hash', 'apple', 'foo', 'bar', 'hello', 'world', 'bits']
 
@@ -29,15 +31,18 @@ function ThemeToggle() {
         background: 'var(--bg-raised)',
         color: 'var(--text-secondary)',
         cursor: 'pointer',
-        fontSize: 18,
-        lineHeight: 1,
+        lineHeight: 0,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         transition: 'background 0.15s, border-color 0.15s, color 0.15s',
       }}
     >
-      {isLight ? '☾' : '☀'}
+      {isLight ? (
+        <ThemeMoonIcon aria-hidden={true} />
+      ) : (
+        <ThemeSunIcon aria-hidden={true} />
+      )}
     </button>
   )
 }
@@ -66,6 +71,7 @@ export default function VisualizerPage() {
   const {
     size, selectedHashes, bits, bitOwners, insertedItems,
     animState,
+    bitLayoutEpoch,
     insert, lookup, resetFilter,
     updateSize, updateHashes,
   } = useBloomFilter(64, ['djb2', 'fnv1a', 'sdbm'])
@@ -268,6 +274,7 @@ export default function VisualizerPage() {
               bitOwners={bitOwners}
               animState={enrichedAnimState}
               size={size}
+              layoutEpoch={bitLayoutEpoch}
             />
           </div>
 
