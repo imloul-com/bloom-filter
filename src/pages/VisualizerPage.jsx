@@ -24,18 +24,15 @@ function ThemeToggle() {
       aria-pressed={isLight}
       style={{
         flexShrink: 0,
-        width: 40,
-        height: 40,
-        borderRadius: 'var(--radius-md)',
-        border: '1px solid var(--border-default)',
-        background: 'var(--bg-raised)',
+        background: 'none',
+        border: 'none',
         color: 'var(--text-secondary)',
         cursor: 'pointer',
         lineHeight: 0,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        transition: 'background 0.15s, border-color 0.15s, color 0.15s',
+        padding: 0,
       }}
     >
       {isLight ? (
