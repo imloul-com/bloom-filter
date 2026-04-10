@@ -1,13 +1,15 @@
 // Collection of named hash functions
 // Each takes (str: string, seed: number, size: number) => index
 
+type HashFn = (str: string, seed: number, size: number) => number
+
 /** Map hash output to [0, size). JS % keeps the dividend's sign; XOR/bit ops can leave h negative as a signed int. */
-function toSlot(h, size) {
+function toSlot(h: number, size: number): number {
   return (h >>> 0) % size
 }
 
 /** 32-bit value before `% m` (for UI). Seed is per-function index: `i * 1327` from getHashes. */
-function djb2Raw(str, seed) {
+function djb2Raw(str: string, seed: number): number {
   let h = (5381 ^ seed) >>> 0
   for (let i = 0; i < str.length; i++) {
     h = (Math.imul(h, 33) ^ str.charCodeAt(i)) >>> 0
@@ -15,7 +17,7 @@ function djb2Raw(str, seed) {
   return h >>> 0
 }
 
-function fnv1aRaw(str, seed) {
+function fnv1aRaw(str: string, seed: number): number {
   let h = (2166136261 ^ seed) >>> 0
   for (let i = 0; i < str.length; i++) {
     h = (Math.imul(h ^ str.charCodeAt(i), 16777619)) >>> 0
@@ -23,7 +25,7 @@ function fnv1aRaw(str, seed) {
   return h >>> 0
 }
 
-function sdbmRaw(str, seed) {
+function sdbmRaw(str: string, seed: number): number {
   let h = seed >>> 0
   for (let i = 0; i < str.length; i++) {
     h = (str.charCodeAt(i) + Math.imul(h, 65599) + (h << 6) + (h << 16)) >>> 0
@@ -31,7 +33,7 @@ function sdbmRaw(str, seed) {
   return h >>> 0
 }
 
-function murmur3Raw(str, seed) {
+function murmur3Raw(str: string, seed: number): number {
   let h = seed >>> 0
   for (let i = 0; i < str.length; i++) {
     let k = str.charCodeAt(i)
@@ -51,7 +53,7 @@ function murmur3Raw(str, seed) {
   return h >>> 0
 }
 
-function crc32Raw(str, seed) {
+function crc32Raw(str: string, seed: number): number {
   let crc = (0xffffffff ^ seed) >>> 0
   for (let i = 0; i < str.length; i++) {
     crc ^= str.charCodeAt(i)
@@ -62,7 +64,7 @@ function crc32Raw(str, seed) {
   return (crc ^ 0xffffffff) >>> 0
 }
 
-function jenkinsRaw(str, seed) {
+function jenkinsRaw(str: string, seed: number): number {
   let h = seed >>> 0
   for (let i = 0; i < str.length; i++) {
     h += str.charCodeAt(i)
@@ -76,7 +78,18 @@ function jenkinsRaw(str, seed) {
   return h >>> 0
 }
 
-const RAW_BY_NAME = {
+export const HASH_FUNCTIONS = {
+  djb2: (str: string, seed: number, size: number) => toSlot(djb2Raw(str, seed), size),
+  fnv1a: (str: string, seed: number, size: number) => toSlot(fnv1aRaw(str, seed), size),
+  sdbm: (str: string, seed: number, size: number) => toSlot(sdbmRaw(str, seed), size),
+  murmur3: (str: string, seed: number, size: number) => toSlot(murmur3Raw(str, seed), size),
+  crc32: (str: string, seed: number, size: number) => toSlot(crc32Raw(str, seed), size),
+  jenkins: (str: string, seed: number, size: number) => toSlot(jenkinsRaw(str, seed), size),
+} as const satisfies Record<string, HashFn>
+
+export type HashFunctionName = keyof typeof HASH_FUNCTIONS
+
+const RAW_BY_NAME: Record<HashFunctionName, (str: string, seed: number) => number> = {
   djb2: djb2Raw,
   fnv1a: fnv1aRaw,
   sdbm: sdbmRaw,
@@ -85,30 +98,17 @@ const RAW_BY_NAME = {
   jenkins: jenkinsRaw,
 }
 
-/**
- * Unsigned 32-bit hash before modulo m (same pipeline as HASH_FUNCTIONS).
- * @param {string} name — key in HASH_FUNCTIONS
- * @param {string} word
- * @param {number} seedIndex — hash column index `i` (seed = i * 1327)
- */
-export function rawHashBeforeMod(name, word, seedIndex) {
-  const raw = RAW_BY_NAME[name]
-  if (!raw) return 0
-  return raw(word, seedIndex * 1327)
+export const HASH_NAMES: HashFunctionName[] = Object.keys(HASH_FUNCTIONS) as HashFunctionName[]
+
+export interface HashPalette {
+  key: string
+  color: string
+  bg: string
+  border: string
+  glow: string
 }
 
-export const HASH_FUNCTIONS = {
-  djb2: (str, seed, size) => toSlot(djb2Raw(str, seed), size),
-  fnv1a: (str, seed, size) => toSlot(fnv1aRaw(str, seed), size),
-  sdbm: (str, seed, size) => toSlot(sdbmRaw(str, seed), size),
-  murmur3: (str, seed, size) => toSlot(murmur3Raw(str, seed), size),
-  crc32: (str, seed, size) => toSlot(crc32Raw(str, seed), size),
-  jenkins: (str, seed, size) => toSlot(jenkinsRaw(str, seed), size),
-}
-
-export const HASH_NAMES = Object.keys(HASH_FUNCTIONS)
-
-export const HASH_COLORS = [
+export const HASH_COLORS: readonly HashPalette[] = [
   { key: 'h1', color: 'var(--h1)', bg: 'var(--h1-bg)', border: 'var(--h1-border)', glow: 'var(--h1-glow)' },
   { key: 'h2', color: 'var(--h2)', bg: 'var(--h2-bg)', border: 'var(--h2-border)', glow: 'var(--h2-glow)' },
   { key: 'h3', color: 'var(--h3)', bg: 'var(--h3-bg)', border: 'var(--h3-border)', glow: 'var(--h3-glow)' },
@@ -117,7 +117,23 @@ export const HASH_COLORS = [
   { key: 'h6', color: 'var(--h6)', bg: 'var(--h6-bg)', border: 'var(--h6-border)', glow: 'var(--h6-glow)' },
 ]
 
-export function getHashes(word, selectedHashes, size) {
+/**
+ * Unsigned 32-bit hash before modulo m (same pipeline as HASH_FUNCTIONS).
+ */
+export function rawHashBeforeMod(
+  name: HashFunctionName,
+  word: string,
+  seedIndex: number,
+): number {
+  const raw = RAW_BY_NAME[name]
+  return raw(word, seedIndex * 1327)
+}
+
+export function getHashes(
+  word: string,
+  selectedHashes: readonly HashFunctionName[],
+  size: number,
+): number[] {
   return selectedHashes.map((name, i) => {
     const fn = HASH_FUNCTIONS[name]
     return fn(word, i * 1327, size)
@@ -129,12 +145,12 @@ export const EST_FP_RATE_SEVERE = 0.1
 /** Estimated FP rate above this is styled “moderate” (amber). */
 export const EST_FP_RATE_MODERATE = 0.01
 
-export function estimateFalsePositiveRate(n, m, k) {
+export function estimateFalsePositiveRate(n: number, m: number, k: number): number {
   if (n === 0) return 0
   return Math.pow(1 - Math.exp(-k * n / m), k)
 }
 
-export function optimalK(m, n) {
+export function optimalK(m: number, n: number): number {
   if (n === 0) return 3
   return Math.max(1, Math.round((m / n) * Math.LN2))
 }
