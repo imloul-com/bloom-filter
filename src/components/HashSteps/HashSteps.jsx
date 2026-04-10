@@ -1,8 +1,9 @@
 import React from 'react'
 import { HASH_COLORS, rawHashBeforeMod } from '@/utils/hashes'
+import { ComputingDots } from './ComputingDots.jsx'
 
 export default function HashSteps({ animState, selectedHashes, word }) {
-  const { phase, hashIdx, indices, result } = animState
+  const { phase, hashIdx, indices } = animState
 
   if (!word && phase !== 'lookup-done' && phase !== 'done') {
     return (
@@ -62,7 +63,6 @@ export default function HashSteps({ animState, selectedHashes, word }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
         {selectedHashes.map((name, i) => {
           const col = HASH_COLORS[i % HASH_COLORS.length]
-          const isDone = indices && i < (hashIdx + 1)
           const isCurrent = i === hashIdx
           const idx = indices?.[i]
 
@@ -70,12 +70,6 @@ export default function HashSteps({ animState, selectedHashes, word }) {
           if (isCurrent && (phase === 'hashing' || phase === 'probing')) rowState = 'computing'
           else if (isCurrent && (phase === 'setting' || phase === 'probe-result')) rowState = 'done'
           else if (i < hashIdx || phase === 'done' || phase === 'lookup-done') rowState = 'done'
-
-          const probeHit = isLookup && rowState === 'done' && idx !== undefined
-            ? animState.probeHit !== undefined && isCurrent
-              ? animState.probeHit
-              : animState.bits?.[idx] // fallback
-            : null
 
           return (
             <div
@@ -186,25 +180,3 @@ export default function HashSteps({ animState, selectedHashes, word }) {
     </div>
   )
 }
-
-function ComputingDots({ color }) {
-  return (
-    <span style={{ display: 'inline-flex', gap: 3, alignItems: 'center' }}>
-      {[0, 1, 2].map(i => (
-        <span key={i} style={{
-          width: 5, height: 5, borderRadius: '50%',
-          background: color,
-          display: 'inline-block',
-          animation: `dotBounce 0.9s ${i * 0.2}s ease-in-out infinite`,
-        }} />
-      ))}
-      <style>{`
-        @keyframes dotBounce {
-          0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-          30% { transform: translateY(-4px); opacity: 1; }
-        }
-      `}</style>
-    </span>
-  )
-}
-

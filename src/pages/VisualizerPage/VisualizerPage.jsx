@@ -1,6 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { useBloomFilter } from '@/hooks/useBloomFilter'
-import { useTheme } from '@/hooks/useTheme'
 import BitArray from '@/components/BitArray'
 import HashSteps from '@/components/HashSteps'
 import Settings from '@/components/Settings'
@@ -8,48 +7,17 @@ import StatsBar from '@/components/StatsBar'
 import InsertedList from '@/components/InsertedList'
 import ResultBanner from '@/components/ResultBanner'
 import { HASH_COLORS } from '@/utils/hashes'
-import ThemeSunIcon from '@/assets/icons/theme-sun.svg?react'
-import ThemeMoonIcon from '@/assets/icons/theme-moon.svg?react'
+import { ThemeToggle } from './ThemeToggle.jsx'
+import { SectionLabel } from './SectionLabel.jsx'
+import { Btn } from './Btn.jsx'
 
 const SUGGESTIONS = ['redis', 'bloom', 'filter', 'hash', 'apple', 'foo', 'bar', 'hello', 'world', 'bits']
-
-function ThemeToggle() {
-  const { theme, toggle } = useTheme()
-  const isLight = theme === 'light'
-  return (
-    <button
-      type="button"
-      onClick={toggle}
-      aria-label={isLight ? 'Switch to dark theme' : 'Switch to light theme'}
-      aria-pressed={isLight}
-      style={{
-        flexShrink: 0,
-        background: 'none',
-        border: 'none',
-        color: 'var(--text-secondary)',
-        cursor: 'pointer',
-        lineHeight: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 0,
-      }}
-    >
-      {isLight ? (
-        <ThemeMoonIcon aria-hidden={true} />
-      ) : (
-        <ThemeSunIcon aria-hidden={true} />
-      )}
-    </button>
-  )
-}
 
 export default function VisualizerPage() {
   const [inputVal, setInputVal] = useState('')
   const [animSpeed, setAnimSpeed] = useState(1)
   const [lastResult, setLastResult] = useState(null)
   const [lastWord, setLastWord] = useState('')
-  const [activeAnimState, setActiveAnimState] = useState({ indices: [], hashIdx: -1, phase: null, word: '', size: 32 })
   const inputRef = useRef(null)
 
   const [windowWidth, setWindowWidth] = useState(
@@ -338,66 +306,5 @@ export default function VisualizerPage() {
       </main>
 
     </div>
-  )
-}
-
-function SectionLabel({ children }) {
-  return (
-    <div style={{
-      fontSize: 11,
-      fontWeight: 600,
-      letterSpacing: '0.07em',
-      textTransform: 'uppercase',
-      color: 'var(--text-tertiary)',
-      marginBottom: 8,
-    }}>
-      {children}
-    </div>
-  )
-}
-
-function Btn({ label, shortcut, color, bg, border, onClick, disabled }) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      style={{
-        height: 44,
-        padding: '0 18px',
-        borderRadius: 'var(--radius-md)',
-        border: `1px solid ${border}`,
-        background: disabled ? 'transparent' : bg,
-        color: disabled ? 'var(--text-muted)' : color,
-        fontFamily: 'var(--font-display)',
-        fontWeight: 700,
-        fontSize: 13,
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 6,
-        transition: 'opacity 0.15s, transform 0.1s',
-        opacity: disabled ? 0.4 : 1,
-        whiteSpace: 'nowrap',
-      }}
-      onMouseEnter={e => { if (!disabled) e.currentTarget.style.opacity = '0.8' }}
-      onMouseLeave={e => { if (!disabled) e.currentTarget.style.opacity = '1' }}
-      onMouseDown={e => { if (!disabled) e.currentTarget.style.transform = 'scale(0.97)' }}
-      onMouseUp={e => { if (!disabled) e.currentTarget.style.transform = 'scale(1)' }}
-    >
-      {label}
-      {shortcut && (
-        <span style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: 10,
-          opacity: 0.6,
-          background: 'var(--bg-raised)',
-          padding: '1px 5px',
-          borderRadius: 3,
-          border: '1px solid var(--border-subtle)',
-        }}>
-          {shortcut}
-        </span>
-      )}
-    </button>
   )
 }

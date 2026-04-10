@@ -5,63 +5,8 @@ import {
   formatBytes,
   HASH_SET_ENTRY_OVERHEAD_BYTES,
 } from '@/utils/memoryFootprint'
-
-const sectionTitle = {
-  fontSize: 10,
-  fontWeight: 700,
-  letterSpacing: '0.08em',
-  textTransform: 'uppercase',
-  color: 'var(--text-tertiary)',
-  marginBottom: 10,
-}
-
-const tile = {
-  background: 'var(--bg-raised)',
-  border: '1px solid var(--border-subtle)',
-  borderRadius: 'var(--radius-md)',
-  padding: '11px 12px',
-  minWidth: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 6,
-}
-
-const tileLabel = {
-  fontSize: 10,
-  fontWeight: 600,
-  letterSpacing: '0.05em',
-  textTransform: 'uppercase',
-  color: 'var(--text-muted)',
-  lineHeight: 1.2,
-}
-
-function StatTile({ label, children, valueStyle = {} }) {
-  return (
-    <div
-      style={{
-        ...tile,
-        gap: 0,
-        justifyContent: 'space-between',
-        height: '100%',
-      }}
-    >
-      <div style={tileLabel}>{label}</div>
-      <div
-        style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: 17,
-          fontWeight: 700,
-          color: 'var(--text-primary)',
-          lineHeight: 1.15,
-          letterSpacing: '-0.02em',
-          ...valueStyle,
-        }}
-      >
-        {children}
-      </div>
-    </div>
-  )
-}
+import { StatTile } from './StatTile.jsx'
+import { sectionTitle, tile, tileLabel } from './statsBarStyles.js'
 
 export default function StatsBar({ bits, insertedItems, size, k }) {
   const setBits = bits.filter(Boolean).length
