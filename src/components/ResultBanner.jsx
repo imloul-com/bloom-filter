@@ -33,28 +33,16 @@ export default function ResultBanner({ result, word }) {
   if (!cfg) return null
 
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'flex-start',
-      gap: 12,
-      padding: '12px 16px',
-      borderRadius: 'var(--radius-lg)',
-      background: cfg.bg,
-      border: `1px solid ${cfg.border}`,
-      animation: 'resultIn 0.35s cubic-bezier(0.34,1.4,0.64,1)',
-    }}>
-      <style>{`
-        @keyframes resultIn {
-          from { opacity: 0; transform: translateY(8px) scale(0.97); }
-          to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-      `}</style>
-      <span style={{ fontSize: 22, lineHeight: 1.2, color: cfg.color }}>{cfg.icon}</span>
+    <div
+      className="flex animate-result-in items-start gap-3 rounded-lg border border-solid px-4 py-3"
+      style={{ background: cfg.bg, borderColor: cfg.border }}
+    >
+      <span className="text-[22px] leading-tight" style={{ color: cfg.color }}>{cfg.icon}</span>
       <div>
-        <div style={{ fontSize: 14, fontWeight: 700, color: cfg.color }}>
+        <div className="text-sm font-bold" style={{ color: cfg.color }}>
           {cfg.title(word)}
         </div>
-        <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 3 }}>
+        <div className="mt-0.5 text-xs text-[var(--text-secondary)]">
           {cfg.sub}
         </div>
       </div>

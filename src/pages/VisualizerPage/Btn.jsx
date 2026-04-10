@@ -1,44 +1,24 @@
 import React from 'react'
+import clsx from 'clsx'
 
 export function Btn({ label, shortcut, color, bg, border, onClick, disabled }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       disabled={disabled}
-      style={{
-        height: 44,
-        padding: '0 18px',
-        borderRadius: 'var(--radius-md)',
-        border: `1px solid ${border}`,
-        background: disabled ? 'transparent' : bg,
-        color: disabled ? 'var(--text-muted)' : color,
-        fontFamily: 'var(--font-display)',
-        fontWeight: 700,
-        fontSize: 13,
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 6,
-        transition: 'opacity 0.15s, transform 0.1s',
-        opacity: disabled ? 0.4 : 1,
-        whiteSpace: 'nowrap',
-      }}
-      onMouseEnter={e => { if (!disabled) e.currentTarget.style.opacity = '0.8' }}
-      onMouseLeave={e => { if (!disabled) e.currentTarget.style.opacity = '1' }}
-      onMouseDown={e => { if (!disabled) e.currentTarget.style.transform = 'scale(0.97)' }}
-      onMouseUp={e => { if (!disabled) e.currentTarget.style.transform = 'scale(1)' }}
+      style={{ '--btn-fg': color, '--btn-bg': bg, '--btn-bd': border }}
+      className={clsx(
+        'flex h-11 items-center gap-1.5 whitespace-nowrap rounded-md border border-solid border-[color:var(--btn-bd)] px-[18px] font-display text-[13px] font-bold transition-[opacity,transform] duration-150',
+        'disabled:cursor-not-allowed disabled:border-[color:var(--btn-bd)] disabled:bg-transparent disabled:text-[var(--text-muted)] disabled:opacity-40',
+        !disabled && 'cursor-pointer hover:opacity-80 active:scale-[0.97]',
+        !disabled && bg !== 'transparent' && 'bg-[var(--btn-bg)] text-[color:var(--btn-fg)]',
+        !disabled && bg === 'transparent' && 'bg-transparent text-[color:var(--btn-fg)]',
+      )}
     >
       {label}
       {shortcut && (
-        <span style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: 10,
-          opacity: 0.6,
-          background: 'var(--bg-raised)',
-          padding: '1px 5px',
-          borderRadius: 3,
-          border: '1px solid var(--border-subtle)',
-        }}>
+        <span className="rounded border border-[var(--border-subtle)] bg-[var(--bg-raised)] px-[5px] py-px font-mono text-[10px] opacity-60">
           {shortcut}
         </span>
       )}

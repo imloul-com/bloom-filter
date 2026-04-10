@@ -12,18 +12,7 @@ export function ThemeToggle() {
       onClick={toggle}
       aria-label={isLight ? 'Switch to dark theme' : 'Switch to light theme'}
       aria-pressed={isLight}
-      style={{
-        flexShrink: 0,
-        background: 'none',
-        border: 'none',
-        color: 'var(--text-secondary)',
-        cursor: 'pointer',
-        lineHeight: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 0,
-      }}
+      className="flex shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0 leading-none text-[var(--text-secondary)]"
     >
       {isLight ? (
         <ThemeMoonIcon aria-hidden={true} />

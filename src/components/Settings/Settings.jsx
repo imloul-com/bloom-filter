@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import clsx from 'clsx'
 import { HASH_NAMES, HASH_COLORS, estimateFalsePositiveRate, optimalK } from '@/utils/hashes'
 import { Toggle } from './Toggle.jsx'
 import { Label } from './Label.jsx'
@@ -11,108 +12,69 @@ export default function Settings({ size, maxSize = 512, selectedHashes, onSizeCh
   const optK = optimalK(size, insertedCount)
 
   return (
-    <div style={{
-      background: 'var(--bg-surface)',
-      border: '1px solid var(--border-subtle)',
-      borderRadius: 'var(--radius-lg)',
-      overflow: 'hidden',
-    }}>
-      {/* Header — always visible */}
+    <div className="overflow-hidden rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
       <button
+        type="button"
         onClick={() => setOpen(o => !o)}
-        style={{
-          width: '100%',
-          padding: '12px 16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          color: 'var(--text-primary)',
-        }}
+        className="flex w-full cursor-pointer items-center justify-between border-0 bg-transparent px-4 py-3 text-[var(--text-primary)]"
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 13, fontWeight: 600 }}>Parameters</span>
-          <span style={{
-            fontSize: 11,
-            fontFamily: 'var(--font-mono)',
-            color: 'var(--text-tertiary)',
-            background: 'var(--bg-raised)',
-            padding: '2px 8px',
-            borderRadius: 4,
-            border: '1px solid var(--border-subtle)',
-          }}>
+        <div className="flex items-center gap-2.5">
+          <span className="text-[13px] font-semibold">Parameters</span>
+          <span className="rounded border border-[var(--border-subtle)] bg-[var(--bg-raised)] px-2 py-0.5 font-mono text-[11px] text-[var(--text-tertiary)]">
             m={size} · k={selectedHashes.length} · fp≈{(fp * 100).toFixed(2)}%
           </span>
         </div>
-        <span style={{
-          fontSize: 14,
-          color: 'var(--text-tertiary)',
-          transform: open ? 'rotate(180deg)' : 'none',
-          transition: 'transform 0.2s',
-        }}>▾</span>
+        <span
+          className={clsx(
+            'text-sm text-[var(--text-tertiary)] transition-transform duration-200',
+            open && 'rotate-180',
+          )}
+        >
+          ▾
+        </span>
       </button>
 
       {open && (
-        <div style={{
-          padding: '0 16px 16px',
-          borderTop: '1px solid var(--border-subtle)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 20,
-          animation: 'settingsOpen 0.2s ease',
-        }}>
-          <style>{`
-            @keyframes settingsOpen {
-              from { opacity: 0; transform: translateY(-6px); }
-              to   { opacity: 1; transform: translateY(0); }
-            }
-          `}</style>
-
-          {/* Bit array size */}
+        <div className="animate-settings-open flex flex-col gap-5 border-t border-[var(--border-subtle)] px-4 pb-4">
           <div>
             <Label>Bit array size (m)</Label>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.45 }}>
+            <div className="mt-1 text-[11px] leading-snug text-[var(--text-muted)]">
               Changing m keeps inserted keys and re-hashes them into the new size. Real Bloom filters only store bits,
               so they cannot resize or change k without the keys — this demo keeps the list on purpose.
             </div>
             {maxSize < 512 && (
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6, fontFamily: 'var(--font-mono)' }}>
+              <div className="mt-1.5 font-mono text-[11px] text-[var(--text-muted)]">
                 Max {maxSize} bits on this screen size
               </div>
             )}
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
+            <div className="mt-2 flex flex-wrap gap-1.5">
               {SIZE_PRESETS.filter(s => s <= maxSize).map(s => (
                 <button
                   key={s}
+                  type="button"
                   onClick={() => onSizeChange(s)}
-                  style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: 12,
-                    fontWeight: 600,
-                    padding: '5px 12px',
-                    borderRadius: 6,
-                    border: `1px solid ${size === s ? 'var(--h1)' : 'var(--border-default)'}`,
-                    background: size === s ? 'var(--h1-bg)' : 'var(--bg-raised)',
-                    color: size === s ? 'var(--h1)' : 'var(--text-secondary)',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
-                  }}
+                  className={clsx(
+                    'cursor-pointer rounded-md border border-solid px-3 py-1 font-mono text-xs font-semibold transition-all duration-150',
+                    size === s
+                      ? 'border-[var(--h1)] bg-[var(--h1-bg)] text-[var(--h1)]'
+                      : 'border-[var(--border-default)] bg-[var(--bg-raised)] text-[var(--text-secondary)]',
+                  )}
                 >
                   {s}
                 </button>
               ))}
             </div>
-            <div style={{ marginTop: 8 }}>
+            <div className="mt-2">
               <input
                 type="range"
-                min={8} max={maxSize} step={8}
+                min={8}
+                max={maxSize}
+                step={8}
                 value={size}
                 onChange={e => onSizeChange(+e.target.value)}
-                style={{ width: '100%', accentColor: 'var(--h1)' }}
+                className="w-full accent-[var(--h1)]"
               />
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+              <div className="flex justify-between font-mono text-[11px] text-[var(--text-muted)]">
                 <span>8</span>
                 {maxSize > 16 && <span>{Math.round(maxSize / 2)}</span>}
                 <span>{maxSize}</span>
@@ -120,19 +82,18 @@ export default function Settings({ size, maxSize = 512, selectedHashes, onSizeCh
             </div>
           </div>
 
-          {/* Hash functions */}
           <div>
             <Label>Hash functions (k = {selectedHashes.length})</Label>
-            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, lineHeight: 1.45 }}>
+            <div className="mt-1 text-[11px] leading-snug text-[var(--text-muted)]">
               Toggling hashes updates k and re-hashes every inserted key into the same m (still demo-only vs a real
               filter).
             </div>
             {insertedCount > 0 && (
-              <div style={{ fontSize: 11, color: 'var(--h3)', marginTop: 6 }}>
+              <div className="mt-1.5 text-[11px] text-[var(--h3)]">
                 Optimal k for {insertedCount} items: {optK}
               </div>
             )}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10 }}>
+            <div className="mt-2.5 flex flex-col gap-1.5">
               {HASH_NAMES.map((name, i) => {
                 const col = HASH_COLORS[i % HASH_COLORS.length]
                 const isSelected = selectedHashes.includes(name)
@@ -141,18 +102,26 @@ export default function Settings({ size, maxSize = 512, selectedHashes, onSizeCh
                 return (
                   <div
                     key={name}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '7px 10px',
-                      borderRadius: 8,
-                      border: `1px solid ${isSelected ? col.border : 'var(--border-subtle)'}`,
-                      background: isSelected ? col.bg : 'var(--bg-raised)',
-                      transition: 'all 0.15s',
-                      cursor: (!isSelected || canDeselect) ? 'pointer' : 'not-allowed',
-                      opacity: !isSelected && selectedHashes.length >= 6 ? 0.4 : 1,
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        if (isSelected && !canDeselect) return
+                        if (!isSelected && selectedHashes.length >= 6) return
+                        const next = isSelected
+                          ? selectedHashes.filter(h => h !== name)
+                          : [...selectedHashes, name]
+                        onHashesChange(next)
+                      }
                     }}
+                    className={clsx(
+                      'flex items-center justify-between rounded-lg border border-solid px-2.5 py-1.5 transition-all duration-150',
+                      (!isSelected || canDeselect) ? 'cursor-pointer' : 'cursor-not-allowed',
+                      !isSelected && selectedHashes.length >= 6 && 'opacity-40',
+                      !isSelected && 'border-[var(--border-subtle)] bg-[var(--bg-raised)]',
+                    )}
+                    style={isSelected ? { borderColor: col.border, background: col.bg } : undefined}
                     onClick={() => {
                       if (isSelected && !canDeselect) return
                       if (!isSelected && selectedHashes.length >= 6) return
@@ -162,19 +131,15 @@ export default function Settings({ size, maxSize = 512, selectedHashes, onSizeCh
                       onHashesChange(next)
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{
-                        width: 8, height: 8, borderRadius: '50%',
-                        background: isSelected ? col.color : 'var(--text-muted)',
-                        flexShrink: 0,
-                        transition: 'background 0.15s',
-                      }} />
-                      <span style={{
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: 12,
-                        fontWeight: 600,
-                        color: isSelected ? col.color : 'var(--text-muted)',
-                      }}>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="size-2 shrink-0 rounded-full transition-colors duration-150"
+                        style={{ background: isSelected ? col.color : 'var(--text-muted)' }}
+                      />
+                      <span
+                        className="font-mono text-xs font-semibold transition-colors duration-150"
+                        style={{ color: isSelected ? col.color : 'var(--text-muted)' }}
+                      >
                         {name}
                       </span>
                     </div>
@@ -197,10 +162,9 @@ export default function Settings({ size, maxSize = 512, selectedHashes, onSizeCh
             </div>
           </div>
 
-          {/* Animation speed */}
           <div>
             <Label>Animation speed</Label>
-            <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+            <div className="mt-2 flex gap-1.5">
               {[
                 { label: 'Slow', val: 0.5 },
                 { label: 'Normal', val: 1 },
@@ -209,26 +173,20 @@ export default function Settings({ size, maxSize = 512, selectedHashes, onSizeCh
               ].map(s => (
                 <button
                   key={s.val}
+                  type="button"
                   onClick={() => onSpeedChange(s.val)}
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 600,
-                    padding: '5px 12px',
-                    borderRadius: 6,
-                    border: `1px solid ${animSpeed === s.val ? 'var(--h2)' : 'var(--border-default)'}`,
-                    background: animSpeed === s.val ? 'var(--h2-bg)' : 'var(--bg-raised)',
-                    color: animSpeed === s.val ? 'var(--h2)' : 'var(--text-secondary)',
-                    cursor: 'pointer',
-                    flex: 1,
-                    transition: 'all 0.15s',
-                  }}
+                  className={clsx(
+                    'flex-1 cursor-pointer rounded-md border border-solid px-3 py-1 text-xs font-semibold transition-all duration-150',
+                    animSpeed === s.val
+                      ? 'border-[var(--h2)] bg-[var(--h2-bg)] text-[var(--h2)]'
+                      : 'border-[var(--border-default)] bg-[var(--bg-raised)] text-[var(--text-secondary)]',
+                  )}
                 >
                   {s.label}
                 </button>
               ))}
             </div>
           </div>
-
         </div>
       )}
     </div>

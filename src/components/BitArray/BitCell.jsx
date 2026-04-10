@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import clsx from 'clsx'
 import { HASH_COLORS } from '@/utils/hashes'
 
 const OVERLAP = {
@@ -14,7 +15,7 @@ function getColorForOwners(owners) {
   return OVERLAP
 }
 
-export function BitCell({ index, isOn, owners, animState, style }) {
+export function BitCell({ index, isOn, owners, animState, className, style }) {
   const [popKey, setPopKey] = useState(0)
   const [probeKey, setProbeKey] = useState(0)
   /** Match current bit on mount so bulk layout changes (resize re-hash) do not look like inserts. */
@@ -38,77 +39,64 @@ export function BitCell({ index, isOn, owners, animState, style }) {
 
   const isHighlighted = isCurrentlyHashing || isCurrentlyProbing
 
+  const borderColor = isHighlighted
+    ? (hColor?.border || col?.border || 'var(--border-subtle)')
+    : isOn
+      ? (col?.border || 'var(--border-default)')
+      : 'var(--border-subtle)'
+  const backgroundColor = isHighlighted
+    ? (hColor?.bg || col?.bg || 'var(--bg-raised)')
+    : isOn
+      ? (col?.bg || 'var(--bg-raised)')
+      : 'var(--bg-raised)'
+  const boxShadow = isHighlighted
+    ? `0 0 16px 2px ${hColor?.glow || col?.glow || 'transparent'}`
+    : isOn && col
+      ? `0 0 8px 0px ${col.glow}`
+      : 'none'
+
+  const digitColor = isHighlighted
+    ? (hColor?.color || col?.color || 'var(--text-secondary)')
+    : isOn
+      ? (col?.color || 'var(--text-secondary)')
+      : 'var(--text-muted)'
+  const indexColor = isHighlighted ? (hColor?.color || 'var(--text-tertiary)') : 'var(--text-muted)'
+
   return (
     <div
-      style={{
-        position: 'relative',
-        zIndex: isHighlighted ? 10 : 1,
-        width: 'var(--cell-size)',
-        height: 'var(--cell-size)',
-        borderRadius: 'var(--cell-radius)',
-        border: `1px solid ${isHighlighted ? (hColor?.border || col?.border || 'var(--border-subtle)') : isOn ? (col?.border || 'var(--border-default)') : 'var(--border-subtle)'}`,
-        background: isHighlighted
-          ? (hColor?.bg || col?.bg || 'var(--bg-raised)')
-          : isOn
-            ? (col?.bg || 'var(--bg-raised)')
-            : 'var(--bg-raised)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        transition: 'background 0.25s, border-color 0.25s',
-        boxShadow: isHighlighted
-          ? `0 0 16px 2px ${hColor?.glow || col?.glow || 'transparent'}`
-          : isOn && col
-            ? `0 0 8px 0px ${col.glow}`
-            : 'none',
-        ...style,
-      }}
-    >
-      {/* Pop animation layer */}
-      {popKey > 0 && (
-        <div key={`pop-${popKey}`} style={{
-          position: 'absolute', inset: -4,
-          borderRadius: 'inherit',
-          border: `2px solid ${col?.color || 'var(--text-primary)'}`,
-          animation: 'bitPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
-          pointerEvents: 'none',
-        }} />
+      className={clsx(
+        'relative flex flex-col items-center justify-center rounded-[var(--cell-radius)] border border-solid transition-[background,border-color] duration-250',
+        'h-[var(--cell-size)] w-[var(--cell-size)]',
+        isHighlighted ? 'z-10' : 'z-[1]',
+        className,
       )}
-      {/* Probe ripple */}
+      style={{ borderColor, backgroundColor, boxShadow, ...style }}
+    >
+      {popKey > 0 && (
+        <div
+          key={`pop-${popKey}`}
+          className="pointer-events-none absolute inset-[-4px] rounded-[inherit] border-2 animate-bit-pop"
+          style={{ borderColor: col?.color || 'var(--text-primary)' }}
+        />
+      )}
       {probeKey > 0 && (
-        <div key={`probe-${probeKey}`} style={{
-          position: 'absolute', inset: -6,
-          borderRadius: 'inherit',
-          border: `1.5px solid ${hColor?.color || 'var(--text-primary)'}`,
-          animation: 'probeRipple 0.55s ease-out forwards',
-          pointerEvents: 'none',
-        }} />
+        <div
+          key={`probe-${probeKey}`}
+          className="pointer-events-none absolute inset-[-6px] rounded-[inherit] border-[1.5px] animate-probe-ripple"
+          style={{ borderColor: hColor?.color || 'var(--text-primary)' }}
+        />
       )}
 
-      <span style={{
-        fontFamily: 'var(--font-mono)',
-        fontSize: 'clamp(11px, var(--cell-font), 16px)',
-        fontWeight: 600,
-        color: isHighlighted
-          ? (hColor?.color || col?.color || 'var(--text-secondary)')
-          : isOn
-            ? (col?.color || 'var(--text-secondary)')
-            : 'var(--text-muted)',
-        transition: 'color 0.2s',
-        lineHeight: 1,
-      }}>
+      <span
+        className="font-mono text-[length:clamp(11px,var(--cell-font),16px)] font-semibold leading-none transition-colors duration-200"
+        style={{ color: digitColor }}
+      >
         {isOn ? '1' : '0'}
       </span>
-      <span style={{
-        fontFamily: 'var(--font-mono)',
-        fontSize: 'clamp(7px, var(--cell-idx-font), 10px)',
-        color: isHighlighted ? (hColor?.color || 'var(--text-tertiary)') : 'var(--text-muted)',
-        position: 'absolute',
-        bottom: '2px',
-        lineHeight: 1,
-        transition: 'color 0.2s',
-      }}>
+      <span
+        className="absolute bottom-0.5 font-mono text-[length:clamp(7px,var(--cell-idx-font),10px)] leading-none transition-colors duration-200"
+        style={{ color: indexColor }}
+      >
         {index}
       </span>
     </div>

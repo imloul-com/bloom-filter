@@ -1,27 +1,17 @@
 import React from 'react'
-import { tile, tileLabel } from './statsBarStyles.js'
+import clsx from 'clsx'
 
-export function StatTile({ label, children, valueStyle = {} }) {
+export function StatTile({ label, children, valueClassName }) {
   return (
-    <div
-      style={{
-        ...tile,
-        gap: 0,
-        justifyContent: 'space-between',
-        height: '100%',
-      }}
-    >
-      <div style={tileLabel}>{label}</div>
+    <div className="flex h-full min-h-0 min-w-0 flex-col justify-between gap-0 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-raised)] px-3 py-[11px]">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.05em] leading-tight text-[var(--text-muted)]">
+        {label}
+      </div>
       <div
-        style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: 17,
-          fontWeight: 700,
-          color: 'var(--text-primary)',
-          lineHeight: 1.15,
-          letterSpacing: '-0.02em',
-          ...valueStyle,
-        }}
+        className={clsx(
+          'font-mono text-[17px] font-bold leading-tight tracking-tight text-[var(--text-primary)]',
+          valueClassName,
+        )}
       >
         {children}
       </div>

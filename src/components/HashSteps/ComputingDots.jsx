@@ -1,22 +1,21 @@
 import React from 'react'
+import clsx from 'clsx'
 
 export function ComputingDots({ color }) {
   return (
-    <span style={{ display: 'inline-flex', gap: 3, alignItems: 'center' }}>
+    <span className="inline-flex items-center gap-[3px]">
       {[0, 1, 2].map(i => (
-        <span key={i} style={{
-          width: 5, height: 5, borderRadius: '50%',
-          background: color,
-          display: 'inline-block',
-          animation: `dotBounce 0.9s ${i * 0.2}s ease-in-out infinite`,
-        }} />
+        <span
+          key={i}
+          className={clsx(
+            'inline-block size-[5px] rounded-full animate-[dotBounce_0.9s_ease-in-out_infinite]',
+            i === 0 && '[animation-delay:0s]',
+            i === 1 && '[animation-delay:0.2s]',
+            i === 2 && '[animation-delay:0.4s]',
+          )}
+          style={{ background: color }}
+        />
       ))}
-      <style>{`
-        @keyframes dotBounce {
-          0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-          30% { transform: translateY(-4px); opacity: 1; }
-        }
-      `}</style>
     </span>
   )
 }

@@ -1,4 +1,5 @@
 import React from 'react'
+import clsx from 'clsx'
 import { BitCell } from './BitCell.jsx'
 import { useScreenBitLimit } from './useScreenBitLimit.js'
 
@@ -13,34 +14,20 @@ export default function BitArray({ bits, bitOwners, animState, size, layoutEpoch
   const cellRadius = size <= 64 ? 7 : 5
 
   return (
-    <div style={{
-      '--cell-size': `${cellSize}px`,
-      '--cell-font': `${cellFont}px`,
-      '--cell-idx-font': `${cellIdxFont}px`,
-      '--cell-radius': `${cellRadius}px`,
-    }}>
-      <style>{`
-        @keyframes bitPop {
-          0%   { opacity: 1; transform: scale(1); }
-          40%  { opacity: 0.8; transform: scale(1.35); }
-          70%  { opacity: 0.4; transform: scale(1.6); }
-          100% { opacity: 0; transform: scale(2); }
-        }
-        @keyframes probeRipple {
-          0%   { opacity: 1; transform: scale(1); }
-          100% { opacity: 0; transform: scale(1.8); }
-        }
-      `}</style>
-      <div style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        gap: size <= 64 ? 5 : 4,
-        padding: '14px',
-        background: 'var(--bg-surface)',
-        borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--border-subtle)',
-      }}>
+    <div
+      style={{
+        '--cell-size': `${cellSize}px`,
+        '--cell-font': `${cellFont}px`,
+        '--cell-idx-font': `${cellIdxFont}px`,
+        '--cell-radius': `${cellRadius}px`,
+      }}
+    >
+      <div
+        className={clsx(
+          'flex flex-wrap justify-center rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-[14px]',
+          size <= 64 ? 'gap-[5px]' : 'gap-1',
+        )}
+      >
         {bits.slice(0, visibleCount).map((bit, i) => (
           <BitCell
             key={`${layoutEpoch}-${i}`}
@@ -51,14 +38,7 @@ export default function BitArray({ bits, bitOwners, animState, size, layoutEpoch
           />
         ))}
         {hiddenCount > 0 && (
-          <div style={{
-            width: '100%',
-            textAlign: 'center',
-            padding: '6px 0 2px',
-            fontFamily: 'var(--font-mono)',
-            fontSize: 11,
-            color: 'var(--text-muted)',
-          }}>
+          <div className="w-full py-1.5 pt-1.5 pb-0.5 text-center font-mono text-[11px] text-[var(--text-muted)]">
             +{hiddenCount} more bits — use a smaller filter size or a wider screen to see all
           </div>
         )}

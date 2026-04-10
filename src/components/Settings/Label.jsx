@@ -2,14 +2,7 @@ import React from 'react'
 
 export function Label({ children }) {
   return (
-    <div style={{
-      fontSize: 11,
-      fontWeight: 600,
-      letterSpacing: '0.07em',
-      textTransform: 'uppercase',
-      color: 'var(--text-tertiary)',
-      marginTop: 14,
-    }}>
+    <div className="mt-3.5 text-[11px] font-semibold uppercase tracking-[0.07em] text-[var(--text-tertiary)]">
       {children}
     </div>
   )

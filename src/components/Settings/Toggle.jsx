@@ -1,4 +1,5 @@
 import React from 'react'
+import clsx from 'clsx'
 
 export function Toggle({ checked, onChange, trackBg, thumbColor }) {
   return (
@@ -13,26 +14,20 @@ export function Toggle({ checked, onChange, trackBg, thumbColor }) {
       }}
       role="switch"
       aria-checked={checked}
-      style={{
-        width: 36, height: 20,
-        borderRadius: 10,
-        background: checked ? trackBg : 'var(--bg-raised)',
-        border: `1px solid ${checked ? thumbColor : 'var(--border-default)'}`,
-        position: 'relative',
-        cursor: 'pointer',
-        transition: 'all 0.2s',
-        flexShrink: 0,
-      }}
+      style={{ '--toggle-track': trackBg, '--toggle-thumb': thumbColor }}
+      className={clsx(
+        'relative h-5 w-9 shrink-0 cursor-pointer rounded-[10px] border border-solid transition-all duration-200',
+        checked
+          ? 'border-[color:var(--toggle-thumb)] bg-[var(--toggle-track)]'
+          : 'border-[var(--border-default)] bg-[var(--bg-raised)]',
+      )}
     >
-      <div style={{
-        position: 'absolute',
-        top: 2,
-        left: checked ? 18 : 2,
-        width: 14, height: 14,
-        borderRadius: '50%',
-        background: checked ? thumbColor : 'var(--text-tertiary)',
-        transition: 'left 0.2s, background 0.2s',
-      }} />
+      <div
+        className={clsx(
+          'absolute top-0.5 size-[14px] rounded-full transition-[left,background] duration-200',
+          checked ? 'left-[18px] bg-[var(--toggle-thumb)]' : 'left-0.5 bg-[var(--text-tertiary)]',
+        )}
+      />
     </div>
   )
 }

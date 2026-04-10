@@ -2,14 +2,7 @@ import React from 'react'
 
 export function SectionLabel({ children }) {
   return (
-    <div style={{
-      fontSize: 11,
-      fontWeight: 600,
-      letterSpacing: '0.07em',
-      textTransform: 'uppercase',
-      color: 'var(--text-tertiary)',
-      marginBottom: 8,
-    }}>
+    <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.07em] text-[var(--text-tertiary)]">
       {children}
     </div>
   )

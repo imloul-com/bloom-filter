@@ -1,4 +1,5 @@
 import React from 'react'
+import clsx from 'clsx'
 import { HASH_COLORS, rawHashBeforeMod } from '@/utils/hashes'
 import { ComputingDots } from './ComputingDots.jsx'
 
@@ -7,19 +8,7 @@ export default function HashSteps({ animState, selectedHashes, word }) {
 
   if (!word && phase !== 'lookup-done' && phase !== 'done') {
     return (
-      <div style={{
-        padding: '16px',
-        background: 'var(--bg-surface)',
-        borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--border-subtle)',
-        color: 'var(--text-muted)',
-        fontSize: '13px',
-        fontFamily: 'var(--font-mono)',
-        minHeight: 80,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+      <div className="flex min-h-20 items-center justify-center rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 font-mono text-[13px] text-[var(--text-muted)]">
         Insert or look up a word to see hash calculations
       </div>
     )
@@ -28,39 +17,17 @@ export default function HashSteps({ animState, selectedHashes, word }) {
   const isLookup = phase === 'probing' || phase === 'probe-result' || phase === 'lookup-done'
 
   return (
-    <div style={{
-      background: 'var(--bg-surface)',
-      borderRadius: 'var(--radius-lg)',
-      border: '1px solid var(--border-subtle)',
-      overflow: 'hidden',
-    }}>
-      {/* Header */}
-      <div style={{
-        padding: '10px 14px',
-        borderBottom: '1px solid var(--border-subtle)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-      }}>
-        <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-tertiary)' }}>
+    <div className="overflow-hidden rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
+      <div className="flex items-center gap-2 border-b border-[var(--border-subtle)] px-3.5 py-2.5">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
           {isLookup ? 'Lookup' : 'Insert'} →
         </span>
-        <span style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: 13,
-          fontWeight: 600,
-          color: 'var(--text-primary)',
-          background: 'var(--bg-raised)',
-          padding: '2px 10px',
-          borderRadius: 20,
-          border: '1px solid var(--border-default)',
-        }}>
-          "{word}"
+        <span className="rounded-full border border-[var(--border-default)] bg-[var(--bg-raised)] px-2.5 py-0.5 font-mono text-[13px] font-semibold text-[var(--text-primary)]">
+          &quot;{word}&quot;
         </span>
       </div>
 
-      {/* Hash rows */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+      <div className="flex flex-col">
         {selectedHashes.map((name, i) => {
           const col = HASH_COLORS[i % HASH_COLORS.length]
           const isCurrent = i === hashIdx
@@ -71,98 +38,58 @@ export default function HashSteps({ animState, selectedHashes, word }) {
           else if (isCurrent && (phase === 'setting' || phase === 'probe-result')) rowState = 'done'
           else if (i < hashIdx || phase === 'done' || phase === 'lookup-done') rowState = 'done'
 
+          const formulaColor = rowState === 'computing' || rowState === 'done'
+            ? 'text-[var(--text-secondary)]'
+            : 'text-[var(--text-muted)]'
+
           return (
             <div
               key={name}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                padding: '10px 14px',
-                borderBottom: i < selectedHashes.length - 1 ? '1px solid var(--border-subtle)' : 'none',
-                background: isCurrent
-                  ? `${col.bg}`
-                  : 'transparent',
-                transition: 'background 0.3s',
-              }}
+              className="flex items-center gap-2.5 border-b border-[var(--border-subtle)] px-3.5 py-2.5 transition-[background] duration-300 last:border-b-0"
+              style={isCurrent ? { background: col.bg } : undefined}
             >
-              {/* Hash name badge */}
-              <div style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: 11,
-                fontWeight: 600,
-                padding: '3px 8px',
-                borderRadius: 5,
-                border: `1px solid ${rowState !== 'pending' ? col.border : 'var(--border-subtle)'}`,
-                color: rowState !== 'pending' ? col.color : 'var(--text-muted)',
-                background: rowState !== 'pending' ? col.bg : 'transparent',
-                minWidth: 72,
-                textAlign: 'center',
-                transition: 'all 0.3s',
-                whiteSpace: 'nowrap',
-              }}>
+              <div
+                className={clsx(
+                  'min-w-[72px] whitespace-nowrap rounded border border-solid px-2 py-0.5 text-center font-mono text-[11px] font-semibold transition-all duration-300',
+                  rowState === 'pending' && 'border-[var(--border-subtle)] bg-transparent text-[var(--text-muted)]',
+                )}
+                style={rowState !== 'pending' ? { borderColor: col.border, color: col.color, background: col.bg } : undefined}
+              >
                 {name}
               </div>
 
-              {/* Arrow + formula */}
-              <div style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: 12,
-                color: rowState === 'computing' ? 'var(--text-secondary)' : rowState === 'done' ? 'var(--text-secondary)' : 'var(--text-muted)',
-                flex: 1,
-                transition: 'color 0.3s',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                flexWrap: 'wrap',
-              }}>
+              <div className={clsx('flex min-w-0 flex-1 flex-wrap items-center gap-1.5 font-mono text-xs transition-colors duration-300', formulaColor)}>
                 {rowState === 'pending' && (
-                  <span style={{ color: 'var(--text-muted)' }}>—</span>
+                  <span className="text-[var(--text-muted)]">—</span>
                 )}
                 {rowState === 'computing' && (
                   <ComputingDots color={col.color} />
                 )}
                 {rowState === 'done' && idx !== undefined && (
-                  <>
-                    <span style={{ color: 'var(--text-secondary)' }}>
-                      {rawHashBeforeMod(name, word, i)} mod {animState.size ?? '…'} =
-                    </span>
-                  </>
+                  <span className="text-[var(--text-secondary)]">
+                    {rawHashBeforeMod(name, word, i)} mod {animState.size ?? '…'} =
+                  </span>
                 )}
               </div>
 
-              {/* Result index */}
               {rowState === 'done' && idx !== undefined && (
-                <div style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: col.color,
-                  background: col.bg,
-                  border: `1px solid ${col.border}`,
-                  borderRadius: 6,
-                  padding: '3px 10px',
-                  minWidth: 36,
-                  textAlign: 'center',
-                  animation: 'fadeUp 0.3s ease',
-                }}>
+                <div
+                  className="min-w-9 animate-fade-up rounded-md border border-solid px-2.5 py-0.5 text-center font-mono text-[13px] font-bold"
+                  style={{ color: col.color, background: col.bg, borderColor: col.border }}
+                >
                   [{idx}]
                 </div>
               )}
 
-              {/* Probe result indicator */}
               {isLookup && rowState === 'done' && idx !== undefined && animState.probeResults?.[i] !== undefined && (
-                <div style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  padding: '3px 8px',
-                  borderRadius: 5,
-                  color: animState.probeResults[i] ? 'var(--h2)' : 'var(--h4)',
-                  background: animState.probeResults[i] ? 'var(--semantic-good-bg)' : 'var(--semantic-bad-bg)',
-                  border: `1px solid ${animState.probeResults[i] ? 'var(--semantic-good-border)' : 'var(--semantic-bad-border)'}`,
-                  animation: 'fadeUp 0.3s ease',
-                }}>
+                <div
+                  className={clsx(
+                    'animate-fade-up rounded border px-2 py-0.5 font-mono text-[11px] font-semibold',
+                    animState.probeResults[i]
+                      ? 'border-[var(--semantic-good-border)] bg-[var(--semantic-good-bg)] text-[var(--h2)]'
+                      : 'border-[var(--semantic-bad-border)] bg-[var(--semantic-bad-bg)] text-[var(--h4)]',
+                  )}
+                >
                   {animState.probeResults[i] ? '1 ✓' : '0 ✗'}
                 </div>
               )}
@@ -170,13 +97,6 @@ export default function HashSteps({ animState, selectedHashes, word }) {
           )
         })}
       </div>
-
-      <style>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(4px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   )
 }

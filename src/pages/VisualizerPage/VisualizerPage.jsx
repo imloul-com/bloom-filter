@@ -20,18 +20,16 @@ export default function VisualizerPage() {
   const [lastWord, setLastWord] = useState('')
   const inputRef = useRef(null)
 
-  const [windowWidth, setWindowWidth] = useState(
-    typeof window !== 'undefined' ? window.innerWidth : 1200
-  )
+  const [maxSize, setMaxSize] = useState(512)
   useEffect(() => {
-    const handle = () => setWindowWidth(window.innerWidth)
-    window.addEventListener('resize', handle)
-    return () => window.removeEventListener('resize', handle)
+    const update = () => {
+      const w = window.innerWidth
+      setMaxSize(w < 640 ? 64 : w < 1024 ? 128 : 512)
+    }
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
   }, [])
-
-  const isMobile = windowWidth < 640
-  const isNarrow = windowWidth < 900
-  const maxSize = windowWidth < 640 ? 64 : windowWidth < 1024 ? 128 : 512
 
   const {
     size, selectedHashes, bits, bitOwners, insertedItems,
@@ -81,102 +79,51 @@ export default function VisualizerPage() {
   const isAnimating = animState.active
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'var(--bg-base)',
-      display: 'flex',
-      flexDirection: 'column',
-    }}>
-      <header style={{
-        padding: isMobile ? '12px 14px 0' : '20px 32px 0',
-        maxWidth: 1100,
-        width: '100%',
-        margin: '0 auto',
-      }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          gap: 12,
-        }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, flexWrap: 'wrap', minWidth: 0 }}>
-            <h1 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: isMobile ? 22 : 28,
-              fontWeight: 800,
-              letterSpacing: '-0.03em',
-              color: 'var(--text-primary)',
-            }}>
+    <div className="flex min-h-screen flex-col bg-[var(--bg-base)] pt-4 sm:pt-6">
+      <header className="mx-auto w-full max-w-[1100px] px-3.5 sm:px-8">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 flex-wrap items-baseline gap-4">
+            <h1 className="font-display text-[22px] font-extrabold tracking-tight text-[var(--text-primary)] sm:text-[28px] sm:tracking-[-0.03em]">
               Bloom Filter
             </h1>
-            <span style={{
-              fontSize: 13,
-              color: 'var(--text-tertiary)',
-              fontWeight: 400,
-            }}>
+            <span className="text-[13px] font-normal text-[var(--text-tertiary)]">
               probabilistic membership · zero false negatives · tunable false positives
             </span>
           </div>
           <ThemeToggle />
         </div>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 10 }}>
+        <div className="mt-2.5 flex flex-wrap gap-3">
           {selectedHashes.map((name, i) => {
             const col = HASH_COLORS[i % HASH_COLORS.length]
             return (
-              <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                <span style={{ width: 8, height: 8, borderRadius: 2, background: col.color, display: 'inline-block' }} />
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: col.color }}>{name}</span>
+              <div key={name} className="flex items-center gap-1.5">
+                <span
+                  className="inline-block size-2 rounded-sm"
+                  style={{ background: col.color }}
+                />
+                <span className="font-mono text-[11px]" style={{ color: col.color }}>{name}</span>
               </div>
             )
           })}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <span style={{ width: 8, height: 8, borderRadius: 2, background: 'var(--overlap-color)', display: 'inline-block' }} />
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--overlap-color)' }}>overlap</span>
+          <div className="flex items-center gap-1.5">
+            <span className="inline-block size-2 rounded-sm bg-[var(--overlap-color)]" />
+            <span className="font-mono text-[11px] text-[var(--overlap-color)]">overlap</span>
           </div>
         </div>
       </header>
 
-      <main style={{
-        flex: 1,
-        maxWidth: 1100,
-        width: '100%',
-        margin: '0 auto',
-        padding: isMobile ? '12px 14px 32px' : isNarrow ? '16px 20px 32px' : '20px 32px 40px',
-        display: 'grid',
-        gridTemplateColumns: isNarrow ? '1fr' : '1fr 340px',
-        gap: isMobile ? 14 : 20,
-        alignItems: 'start',
-      }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{
-            display: 'flex',
-            gap: 8,
-            flexWrap: 'wrap',
-          }}>
+      <main className="mx-auto grid w-full max-w-[1100px] flex-1 grid-cols-1 items-start gap-3.5 px-3.5 pb-8 pt-3 min-[640px]:px-5 min-[640px]:pb-8 min-[640px]:pt-4 min-[900px]:grid-cols-[1fr_340px] min-[900px]:gap-5 min-[900px]:px-8 min-[900px]:pb-10 min-[900px]:pt-5">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap gap-2">
             <input
               ref={inputRef}
               value={inputVal}
               onChange={e => setInputVal(e.target.value)}
               onKeyDown={handleKey}
-              placeholder='Type a word… Enter to insert, Tab to look up'
+              placeholder="Type a word… Enter to insert, Tab to look up"
               maxLength={64}
               disabled={isAnimating}
-              style={{
-                flex: 1,
-                minWidth: 200,
-                height: 44,
-                padding: '0 16px',
-                fontFamily: 'var(--font-mono)',
-                fontSize: 15,
-                background: 'var(--bg-surface)',
-                border: '1px solid var(--border-default)',
-                borderRadius: 'var(--radius-md)',
-                color: 'var(--text-primary)',
-                outline: 'none',
-                transition: 'border-color 0.15s',
-              }}
-              onFocus={e => e.target.style.borderColor = 'var(--border-strong)'}
-              onBlur={e => e.target.style.borderColor = 'var(--border-default)'}
+              className="h-11 min-w-[200px] flex-1 rounded-md border border-[var(--border-default)] bg-[var(--bg-surface)] px-4 font-mono text-[15px] text-[var(--text-primary)] outline-none transition-[border-color] duration-150 focus:border-[var(--border-strong)]"
             />
             <Btn
               label="Insert"
@@ -206,26 +153,15 @@ export default function VisualizerPage() {
             />
           </div>
 
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' }}>
-            <span style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Try:</span>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[11px] uppercase tracking-wide text-[var(--text-muted)]">Try:</span>
             {SUGGESTIONS.map(s => (
               <button
                 key={s}
+                type="button"
                 onClick={() => { setInputVal(s); inputRef.current?.focus() }}
                 disabled={isAnimating}
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: 11,
-                  padding: '3px 9px',
-                  borderRadius: 4,
-                  border: '1px solid var(--border-subtle)',
-                  background: 'transparent',
-                  color: 'var(--text-muted)',
-                  cursor: 'pointer',
-                  transition: 'all 0.1s',
-                }}
-                onMouseEnter={e => { e.target.style.borderColor = 'var(--border-default)'; e.target.style.color = 'var(--text-secondary)' }}
-                onMouseLeave={e => { e.target.style.borderColor = 'var(--border-subtle)'; e.target.style.color = 'var(--text-muted)' }}
+                className="cursor-pointer rounded border border-[var(--border-subtle)] bg-transparent px-2 py-0.5 font-mono text-[11px] text-[var(--text-muted)] transition-all duration-100 hover:border-[var(--border-default)] hover:text-[var(--text-secondary)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {s}
               </button>
@@ -260,7 +196,7 @@ export default function VisualizerPage() {
           <InsertedList items={insertedItems} />
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, ...(isNarrow ? {} : { position: 'sticky', top: 20 }) }}>
+        <div className="flex flex-col gap-4 min-[900px]:sticky min-[900px]:top-5">
           <div>
             <SectionLabel>Hash calculations</SectionLabel>
             <HashSteps
@@ -281,13 +217,8 @@ export default function VisualizerPage() {
             insertedCount={insertedItems.length}
           />
 
-          <div style={{
-            padding: '14px 16px',
-            background: 'var(--bg-surface)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-lg)',
-          }}>
-            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'var(--text-tertiary)', marginBottom: 10 }}>
+          <div className="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] px-4 py-3.5">
+            <div className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.07em] text-[var(--text-tertiary)]">
               How it works
             </div>
             {[
@@ -296,15 +227,14 @@ export default function VisualizerPage() {
               ['False positive', 'All bits set by coincidence from other insertions — the core trade-off'],
               ['No false negatives', 'If a bit is 0, it was never set — guaranteed absence'],
             ].map(([t, d]) => (
-              <div key={t} style={{ marginBottom: 8 }}>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)' }}>{t}</span>
-                <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 4 }}>— {d}</span>
+              <div key={t} className="mb-2 last:mb-0">
+                <span className="font-mono text-[11px] font-semibold text-[var(--text-secondary)]">{t}</span>
+                <span className="ml-1 text-[11px] text-[var(--text-muted)]">— {d}</span>
               </div>
             ))}
           </div>
         </div>
       </main>
-
     </div>
   )
 }
