@@ -1,11 +1,37 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import clsx from 'clsx'
-import { HASH_NAMES, HASH_COLORS, estimateFalsePositiveRate, optimalK } from '@/utils/hashes'
-import { Toggle } from './Toggle.jsx'
-import { Label } from './Label.jsx'
-import { SIZE_PRESETS } from './constants.js'
+import {
+  HASH_NAMES,
+  HASH_COLORS,
+  estimateFalsePositiveRate,
+  optimalK,
+  type HashFunctionName,
+} from '@/utils/hashes'
+import { Toggle } from './Toggle'
+import { Label } from './Label'
+import { SIZE_PRESETS } from './constants'
 
-export default function Settings({ size, maxSize = 512, selectedHashes, onSizeChange, onHashesChange, animSpeed, onSpeedChange, insertedCount }) {
+export interface SettingsProps {
+  size: number
+  maxSize?: number
+  selectedHashes: HashFunctionName[]
+  onSizeChange: (size: number) => void
+  onHashesChange: (hashes: HashFunctionName[]) => void
+  animSpeed: number
+  onSpeedChange: (speed: number) => void
+  insertedCount: number
+}
+
+export default function Settings({
+  size,
+  maxSize = 512,
+  selectedHashes,
+  onSizeChange,
+  onHashesChange,
+  animSpeed,
+  onSpeedChange,
+  insertedCount,
+}: SettingsProps) {
   const [open, setOpen] = useState(false)
 
   const fp = estimateFalsePositiveRate(insertedCount, size, selectedHashes.length)
@@ -95,7 +121,7 @@ export default function Settings({ size, maxSize = 512, selectedHashes, onSizeCh
             )}
             <div className="mt-2.5 flex flex-col gap-1.5">
               {HASH_NAMES.map((name, i) => {
-                const col = HASH_COLORS[i % HASH_COLORS.length]
+                const col = HASH_COLORS[i % HASH_COLORS.length]!
                 const isSelected = selectedHashes.includes(name)
                 const canDeselect = selectedHashes.length > 1
 

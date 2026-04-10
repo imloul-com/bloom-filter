@@ -1,7 +1,10 @@
-import React from 'react'
 import clsx from 'clsx'
 
-export function ComputingDots({ color }) {
+export interface ComputingDotsProps {
+  color: string
+}
+
+export function ComputingDots({ color }: ComputingDotsProps) {
   return (
     <span className="inline-flex items-center gap-[3px]">
       {[0, 1, 2].map(i => (

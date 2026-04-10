@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { RouterProvider } from 'react-router-dom'
 import { createAppRouter } from '@/router/appRouter'
 

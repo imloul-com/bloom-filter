@@ -1,13 +1,19 @@
-import React from 'react'
 import { estimateFalsePositiveRate, EST_FP_RATE_MODERATE, EST_FP_RATE_SEVERE } from '@/utils/hashes'
 import {
   compareBloomVsHashSet,
   formatBytes,
   HASH_SET_ENTRY_OVERHEAD_BYTES,
 } from '@/utils/memoryFootprint'
-import { StatTile } from './StatTile.jsx'
+import { StatTile } from './StatTile'
 
-export default function StatsBar({ bits, insertedItems, size, k }) {
+export interface StatsBarProps {
+  bits: number[]
+  insertedItems: readonly string[]
+  size: number
+  k: number
+}
+
+export default function StatsBar({ bits, insertedItems, size, k }: StatsBarProps) {
   const setBits = bits.filter(Boolean).length
   const fp = estimateFalsePositiveRate(insertedItems.length, size, k)
   const fillPct = Math.round((setBits / size) * 100)

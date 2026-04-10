@@ -1,6 +1,15 @@
-import React from 'react'
+import type { LookupResult } from '@/types/bloom'
 
-const CONFIGS = {
+interface ResultBannerConfig {
+  icon: string
+  color: string
+  bg: string
+  border: string
+  title: (w: string) => string
+  sub: string
+}
+
+const CONFIGS: Record<LookupResult, ResultBannerConfig> = {
   found: {
     icon: '✓',
     color: 'var(--h2)',
@@ -27,10 +36,14 @@ const CONFIGS = {
   },
 }
 
-export default function ResultBanner({ result, word }) {
+export interface ResultBannerProps {
+  result: LookupResult | null | undefined
+  word: string
+}
+
+export default function ResultBanner({ result, word }: ResultBannerProps) {
   if (!result || !word) return null
   const cfg = CONFIGS[result]
-  if (!cfg) return null
 
   return (
     <div

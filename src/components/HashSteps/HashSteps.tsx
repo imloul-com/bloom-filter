@@ -1,9 +1,15 @@
-import React from 'react'
 import clsx from 'clsx'
-import { HASH_COLORS, rawHashBeforeMod } from '@/utils/hashes'
-import { ComputingDots } from './ComputingDots.jsx'
+import { HASH_COLORS, rawHashBeforeMod, type HashFunctionName } from '@/utils/hashes'
+import { ComputingDots } from './ComputingDots'
+import type { BloomAnimStateView } from '@/types/bloom'
 
-export default function HashSteps({ animState, selectedHashes, word }) {
+export interface HashStepsProps {
+  animState: BloomAnimStateView
+  selectedHashes: readonly HashFunctionName[]
+  word: string
+}
+
+export default function HashSteps({ animState, selectedHashes, word }: HashStepsProps) {
   const { phase, hashIdx, indices } = animState
 
   if (!word && phase !== 'lookup-done' && phase !== 'done') {
@@ -29,11 +35,11 @@ export default function HashSteps({ animState, selectedHashes, word }) {
 
       <div className="flex flex-col">
         {selectedHashes.map((name, i) => {
-          const col = HASH_COLORS[i % HASH_COLORS.length]
+          const col = HASH_COLORS[i % HASH_COLORS.length]!
           const isCurrent = i === hashIdx
-          const idx = indices?.[i]
+          const idx = indices[i]
 
-          let rowState = 'pending'
+          let rowState: 'pending' | 'computing' | 'done' = 'pending'
           if (isCurrent && (phase === 'hashing' || phase === 'probing')) rowState = 'computing'
           else if (isCurrent && (phase === 'setting' || phase === 'probe-result')) rowState = 'done'
           else if (i < hashIdx || phase === 'done' || phase === 'lookup-done') rowState = 'done'
@@ -81,7 +87,7 @@ export default function HashSteps({ animState, selectedHashes, word }) {
                 </div>
               )}
 
-              {isLookup && rowState === 'done' && idx !== undefined && animState.probeResults?.[i] !== undefined && (
+              {isLookup && rowState === 'done' && idx !== undefined && animState.probeResults[i] !== undefined && (
                 <div
                   className={clsx(
                     'animate-fade-up rounded border px-2 py-0.5 font-mono text-[11px] font-semibold',

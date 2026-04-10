@@ -1,13 +1,25 @@
-import React from 'react'
+import type { CSSProperties } from 'react'
 import clsx from 'clsx'
 
-export function Btn({ label, shortcut, color, bg, border, onClick, disabled }) {
+export interface BtnProps {
+  label: string
+  shortcut?: string
+  color: string
+  bg: string
+  border: string
+  onClick: () => void
+  disabled?: boolean
+}
+
+export function Btn({ label, shortcut, color, bg, border, onClick, disabled }: BtnProps) {
+  const vars = { '--btn-fg': color, '--btn-bg': bg, '--btn-bd': border } as CSSProperties
+
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      style={{ '--btn-fg': color, '--btn-bg': bg, '--btn-bd': border }}
+      style={vars}
       className={clsx(
         'flex h-11 items-center gap-1.5 whitespace-nowrap rounded-md border border-solid border-[color:var(--btn-bd)] px-[18px] font-display text-[13px] font-bold transition-[opacity,transform] duration-150',
         'disabled:cursor-not-allowed disabled:border-[color:var(--btn-bd)] disabled:bg-transparent disabled:text-[var(--text-muted)] disabled:opacity-40',

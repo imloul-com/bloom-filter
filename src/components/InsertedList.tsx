@@ -1,6 +1,8 @@
-import React from 'react'
+export interface InsertedListProps {
+  items: readonly string[]
+}
 
-export default function InsertedList({ items }) {
+export default function InsertedList({ items }: InsertedListProps) {
   return (
     <div>
       <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.07em] text-[var(--text-tertiary)]">
@@ -14,7 +16,7 @@ export default function InsertedList({ items }) {
         )}
         {items.map((w, i) => (
           <span
-            key={w + i}
+            key={`${w}-${i}`}
             className="animate-chip-in rounded-full border border-[var(--border-default)] bg-[var(--bg-raised)] px-2.5 py-0.5 font-mono text-xs text-[var(--text-secondary)]"
           >
             {w}

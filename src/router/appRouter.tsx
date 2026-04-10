@@ -2,7 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import AppLayout from '@/layouts/AppLayout'
 import VisualizerPage from '@/pages/VisualizerPage'
 
-export function createAppRouter(basename) {
+export function createAppRouter(basename: string) {
   return createBrowserRouter(
     [
       {
@@ -14,6 +14,6 @@ export function createAppRouter(basename) {
         ],
       },
     ],
-    { basename }
+    { basename },
   )
 }

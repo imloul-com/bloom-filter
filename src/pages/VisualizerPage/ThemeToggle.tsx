@@ -1,4 +1,3 @@
-import React from 'react'
 import { useTheme } from '@/hooks/useTheme'
 import ThemeSunIcon from '@/assets/icons/theme-sun.svg?react'
 import ThemeMoonIcon from '@/assets/icons/theme-moon.svg?react'

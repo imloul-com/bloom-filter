@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useCallback, useEffect, type KeyboardEvent } from 'react'
 import { useBloomFilter } from '@/hooks/useBloomFilter'
 import BitArray from '@/components/BitArray'
 import HashSteps from '@/components/HashSteps'
@@ -7,18 +7,19 @@ import StatsBar from '@/components/StatsBar'
 import InsertedList from '@/components/InsertedList'
 import ResultBanner from '@/components/ResultBanner'
 import { HASH_COLORS } from '@/utils/hashes'
-import { ThemeToggle } from './ThemeToggle.jsx'
-import { SectionLabel } from './SectionLabel.jsx'
-import { Btn } from './Btn.jsx'
+import type { BloomAnimStateView, LookupResult } from '@/types/bloom'
+import { ThemeToggle } from './ThemeToggle'
+import { SectionLabel } from './SectionLabel'
+import { Btn } from './Btn'
 
-const SUGGESTIONS = ['redis', 'bloom', 'filter', 'hash', 'apple', 'foo', 'bar', 'hello', 'world', 'bits']
+const SUGGESTIONS = ['redis', 'bloom', 'filter', 'hash', 'apple', 'foo', 'bar', 'hello', 'world', 'bits'] as const
 
 export default function VisualizerPage() {
   const [inputVal, setInputVal] = useState('')
   const [animSpeed, setAnimSpeed] = useState(1)
-  const [lastResult, setLastResult] = useState(null)
+  const [lastResult, setLastResult] = useState<LookupResult | null>(null)
   const [lastWord, setLastWord] = useState('')
-  const inputRef = useRef(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const [maxSize, setMaxSize] = useState(512)
   useEffect(() => {
@@ -43,7 +44,7 @@ export default function VisualizerPage() {
     if (size > maxSize) updateSize(maxSize)
   }, [maxSize]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const enrichedAnimState = { ...animState, size, probeResults: {} }
+  const enrichedAnimState: BloomAnimStateView = { ...animState, size, probeResults: {} }
 
   const handleInsert = useCallback(async () => {
     const word = inputVal.trim()
@@ -71,9 +72,9 @@ export default function VisualizerPage() {
     setInputVal('')
   }
 
-  const handleKey = (e) => {
-    if (e.key === 'Enter') handleInsert()
-    if (e.key === 'Tab') { e.preventDefault(); handleLookup() }
+  const handleKey = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') void handleInsert()
+    if (e.key === 'Tab') { e.preventDefault(); void handleLookup() }
   }
 
   const isAnimating = animState.active
@@ -94,7 +95,7 @@ export default function VisualizerPage() {
         </div>
         <div className="mt-2.5 flex flex-wrap gap-3">
           {selectedHashes.map((name, i) => {
-            const col = HASH_COLORS[i % HASH_COLORS.length]
+            const col = HASH_COLORS[i % HASH_COLORS.length]!
             return (
               <div key={name} className="flex items-center gap-1.5">
                 <span
@@ -131,7 +132,7 @@ export default function VisualizerPage() {
               color="var(--h1)"
               bg="var(--h1-bg)"
               border="var(--h1-border)"
-              onClick={handleInsert}
+              onClick={() => void handleInsert()}
               disabled={isAnimating || !inputVal.trim()}
             />
             <Btn
@@ -140,7 +141,7 @@ export default function VisualizerPage() {
               color="var(--h2)"
               bg="var(--h2-bg)"
               border="var(--h2-border)"
-              onClick={handleLookup}
+              onClick={() => void handleLookup()}
               disabled={isAnimating || !inputVal.trim()}
             />
             <Btn
@@ -179,9 +180,9 @@ export default function VisualizerPage() {
             />
           </div>
 
-          {!animState.active && (lastResult || animState.phase === 'lookup-done') && (
+          {!animState.active && (lastResult != null || animState.phase === 'lookup-done') && (
             <ResultBanner
-              result={lastResult || animState.result}
+              result={lastResult ?? animState.result}
               word={lastWord}
             />
           )}

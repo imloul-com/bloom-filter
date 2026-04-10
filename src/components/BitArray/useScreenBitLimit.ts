@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
-export function useScreenBitLimit() {
-  const [limit, setLimit] = useState(Infinity)
+export function useScreenBitLimit(): number {
+  const [limit, setLimit] = useState<number>(Infinity)
   useEffect(() => {
     const update = () => {
       const w = window.innerWidth

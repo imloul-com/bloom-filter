@@ -1,29 +1,46 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import clsx from 'clsx'
-import { HASH_COLORS } from '@/utils/hashes'
+import { HASH_COLORS, type HashPalette } from '@/utils/hashes'
+import type { BloomAnimStateView } from '@/types/bloom'
 
-const OVERLAP = {
+const OVERLAP: HashPalette = {
+  key: 'overlap',
   color: 'var(--overlap-color)',
   bg: 'var(--overlap-bg)',
   border: 'var(--overlap-border)',
   glow: 'var(--overlap-glow)',
 }
 
-function getColorForOwners(owners) {
+function getColorForOwners(owners: Set<number> | undefined): HashPalette | null {
   if (!owners || owners.size === 0) return null
-  if (owners.size === 1) return HASH_COLORS[[...owners][0] % HASH_COLORS.length]
+  if (owners.size === 1) return HASH_COLORS[[...owners][0]! % HASH_COLORS.length] ?? null
   return OVERLAP
 }
 
-export function BitCell({ index, isOn, owners, animState, className, style }) {
+export interface BitCellProps {
+  index: number
+  isOn: boolean
+  owners: Set<number> | undefined
+  animState: BloomAnimStateView
+  className?: string
+  style?: CSSProperties
+}
+
+export function BitCell({ index, isOn, owners, animState, className, style }: BitCellProps) {
   const [popKey, setPopKey] = useState(0)
   const [probeKey, setProbeKey] = useState(0)
   /** Match current bit on mount so bulk layout changes (resize re-hash) do not look like inserts. */
   const prevOn = useRef(isOn)
 
-  const activeHashIdx = animState.indices?.indexOf(index)
-  const isCurrentlyProbing = animState.phase === 'probing' && animState.hashIdx === activeHashIdx && animState.indices?.[animState.hashIdx] === index
-  const isCurrentlyHashing = (animState.phase === 'hashing' || animState.phase === 'setting') && animState.hashIdx === activeHashIdx && animState.indices?.[animState.hashIdx] === index
+  const activeHashIdx = animState.indices.indexOf(index)
+  const isCurrentlyProbing =
+    animState.phase === 'probing' &&
+    animState.hashIdx === activeHashIdx &&
+    animState.indices[animState.hashIdx] === index
+  const isCurrentlyHashing =
+    (animState.phase === 'hashing' || animState.phase === 'setting') &&
+    animState.hashIdx === activeHashIdx &&
+    animState.indices[animState.hashIdx] === index
 
   useEffect(() => {
     if (isOn && !prevOn.current) setPopKey(k => k + 1)
@@ -35,7 +52,7 @@ export function BitCell({ index, isOn, owners, animState, className, style }) {
   }, [isCurrentlyProbing])
 
   const col = getColorForOwners(owners)
-  const hColor = activeHashIdx >= 0 ? HASH_COLORS[activeHashIdx % HASH_COLORS.length] : null
+  const hColor = activeHashIdx >= 0 ? HASH_COLORS[activeHashIdx % HASH_COLORS.length] : undefined
 
   const isHighlighted = isCurrentlyHashing || isCurrentlyProbing
 

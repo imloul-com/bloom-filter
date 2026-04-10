@@ -1,9 +1,24 @@
-import React from 'react'
+import type { CSSProperties } from 'react'
 import clsx from 'clsx'
-import { BitCell } from './BitCell.jsx'
-import { useScreenBitLimit } from './useScreenBitLimit.js'
+import { BitCell } from './BitCell'
+import { useScreenBitLimit } from './useScreenBitLimit'
+import type { BloomAnimStateView } from '@/types/bloom'
 
-export default function BitArray({ bits, bitOwners, animState, size, layoutEpoch = 0 }) {
+export interface BitArrayProps {
+  bits: number[]
+  bitOwners: Set<number>[]
+  animState: BloomAnimStateView
+  size: number
+  layoutEpoch?: number
+}
+
+export default function BitArray({
+  bits,
+  bitOwners,
+  animState,
+  size,
+  layoutEpoch = 0,
+}: BitArrayProps) {
   const screenBitLimit = useScreenBitLimit()
   const visibleCount = Math.min(size, screenBitLimit)
   const hiddenCount = size - visibleCount
@@ -13,15 +28,15 @@ export default function BitArray({ bits, bitOwners, animState, size, layoutEpoch
   const cellIdxFont = size <= 32 ? 9 : size <= 64 ? 8 : 7
   const cellRadius = size <= 64 ? 7 : 5
 
+  const cellVars = {
+    '--cell-size': `${cellSize}px`,
+    '--cell-font': `${cellFont}px`,
+    '--cell-idx-font': `${cellIdxFont}px`,
+    '--cell-radius': `${cellRadius}px`,
+  } as CSSProperties
+
   return (
-    <div
-      style={{
-        '--cell-size': `${cellSize}px`,
-        '--cell-font': `${cellFont}px`,
-        '--cell-idx-font': `${cellIdxFont}px`,
-        '--cell-radius': `${cellRadius}px`,
-      }}
-    >
+    <div style={cellVars}>
       <div
         className={clsx(
           'flex flex-wrap justify-center rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-[14px]',
